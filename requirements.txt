@@ -1,0 +1,24 @@
+# Dependencies for the AI Text Detector project (pinned versions)
+numpy==1.23.5         # Fundamental package for numerical computations
+pandas==1.5.3         # Data manipulation and analysis library
+scikit-learn==1.3.0   # Machine learning utilities (train/test split, metrics, etc.)
+matplotlib==3.7.1     # Plotting library for static visualizations
+seaborn==0.13.2       # Statistical data visualization (built on matplotlib)
+plotly==5.24.0        # Interactive plotting library (for interactive visuals)
+dash==2.18.1          # Dash framework for interactive web dashboards
+jupyter-dash==0.4.2   # Allows running Dash apps inside Jupyter notebooks
+streamlit==1.25.0     # Streamlit framework for data science web apps
+beautifulsoup4==4.12.2 # HTML parsing (for cleaning text from HTML tags)
+langdetect==1.0.9     # Language detection library (to filter non-English text)
+textstat==0.7.3       # Readability metrics (e.g., Flesch-Kincaid, Gunning Fog)
+nltk==3.9.1           # Natural Language Toolkit (lemmatization, sentiment analysis)
+# Note: NLTK may require downloading data resources (e.g., nltk.download('vader_lexicon')).
+transformers==4.30.2  # HuggingFace Transformers (BERT, RoBERTa, Longformer, etc.)
+torch==2.0.1          # PyTorch deep learning library (backend for Transformers)
+optuna==3.2.0         # Hyperparameter optimization framework
+wandb==0.16.2         # Weights & Biases for experiment tracking and logging
+shap==0.41.0          # SHAP (SHapley Additive exPlanations) for model interpretability
+lime==0.2.0.1         # LIME (Local Interpretable Model-Agnostic Explanations)
+# Optional (for future feature stubs):
+# spacy==3.5.3        # (Optional) spaCy for advanced NLP (e.g., NER)
+# en-core-web-sm==3.5.0  # (Optional) spaCy English model for NER
