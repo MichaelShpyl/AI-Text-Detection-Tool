@@ -7,6 +7,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import yaml
 import numpy as np
 from lime.lime_text import LimeTextExplainer
+import json
+import datetime
 
 # Load config to get model path
 with open("config.yaml", "r") as f:
@@ -76,3 +78,38 @@ def explain_prediction(text, tokenizer, model, num_features=6):
     # Get explanation weights for the predicted class
     explanation = exp.as_list(label=pred_idx)
     return explanation
+
+
+def save_session_entry(text, predicted_label, mode='json'):
+    """
+    Save a record of the input text and model prediction to a session log.
+    Args:
+        text (str): The input text analyzed.
+        predicted_label (str): The model's predicted class for the text.
+        mode (str): 'json' or 'csv' indicating the format (Dash uses JSON, Streamlit uses CSV).
+    """
+    timestamp = datetime.datetime.now().isoformat(sep=' ', timespec='seconds')
+    if mode == 'json':
+        log_path = config['paths']['session_log_json']
+        entry = {"timestamp": timestamp, "text": text, "predicted_label": predicted_label}
+        try:
+            with open(log_path, 'r') as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+        data.append(entry)
+        with open(log_path, 'w') as f:
+            json.dump(data, f, indent=2)
+    elif mode == 'csv':
+        log_path = config['paths']['session_log_csv']
+        header = "timestamp,text,predicted_label\n"
+        # Make sure newlines in text don’t break CSV rows
+        safe_text = text.replace('\n', ' ').replace('\r', ' ')
+        line = f"{timestamp},\"{safe_text}\",{predicted_label}\n"
+        try:
+            with open(log_path, 'x') as f:  # create file if not exists
+                f.write(header)
+                f.write(line)
+        except FileExistsError:
+            with open(log_path, 'a') as f:
+                f.write(line)
