@@ -13,7 +13,7 @@ langdetect==1.0.9     # Language detection library (to filter non-English text)
 textstat==0.7.3       # Readability metrics (e.g., Flesch-Kincaid, Gunning Fog)
 nltk==3.9.1           # Natural Language Toolkit (lemmatization, sentiment analysis)
 # Note: NLTK may require downloading data resources (e.g., nltk.download('vader_lexicon')).
-transformers==4.30.2  # HuggingFace Transformers (BERT, RoBERTa, Longformer, etc.)
+transformers>=4.33.0  # HuggingFace Transformers (BERT, RoBERTa, Longformer, etc.)
 torch==2.0.1          # PyTorch deep learning library (backend for Transformers)
 optuna==3.2.0         # Hyperparameter optimization framework
 wandb==0.16.2         # Weights & Biases for experiment tracking and logging

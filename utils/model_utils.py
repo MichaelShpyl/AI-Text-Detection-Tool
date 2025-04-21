@@ -1,57 +1,38 @@
-import torch
-import torch.nn as nn
-from transformers import Trainer
+"""
+Model utilities for loading tokenizers and models.
+Also will include custom Trainer and metrics for fine-tuning transformers.
+"""
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-def focal_loss(logits, labels, alpha=None, gamma=2):
-    """
-    Compute focal loss for multi-class classification.
-    logits: model outputs (before softmax).
-    labels: true labels.
-    alpha: class weight tensor (for addressing class imbalance).
-    gamma: focusing parameter (int).
-    """
-    ce_loss = nn.functional.cross_entropy(logits, labels, reduction='none', weight=alpha)
-    # Get the probability of the true class
-    pt = torch.softmax(logits, dim=-1)[range(len(labels)), labels]
-    # Focal loss scaling factor
-    focal_factor = (1 - pt) ** gamma
-    loss = focal_factor * ce_loss
-    return loss.mean()
+# Default model name mapping for convenience
+_model_name_map = {
+    "bert": "bert-base-uncased",
+    "roberta": "roberta-base",
+    "longformer": "allenai/longformer-base-4096"
+}
 
-class CustomTrainer(Trainer):
+def get_tokenizer(model_name: str):
     """
-    Custom Trainer to incorporate class-weighted and focal loss.
+    Get a HuggingFace tokenizer for the specified model name.
+    Args:
+        model_name (str): Name or key of the model (e.g., 'bert', 'roberta', or full HF model name).
+    Returns:
+        PreTrainedTokenizer: The tokenizer instance.
     """
-    def __init__(self, use_focal=False, alpha=None, gamma=2, **kwargs):
-        """
-        use_focal: if True, use focal loss; if False, use standard CrossEntropy.
-        alpha: list or tensor of class weights (for cross-entropy or focal loss alpha).
-        gamma: focusing parameter for focal loss.
-        """
-        super().__init__(**kwargs)
-        self.use_focal = use_focal
-        self.gamma = gamma
-        if alpha is not None:
-            self.class_weights = torch.tensor(alpha, dtype=torch.float)
-        else:
-            self.class_weights = None
+    # Map shorthand names to full model identifiers if needed
+    hf_name = _model_name_map.get(model_name.lower(), model_name)
+    tokenizer = AutoTokenizer.from_pretrained(hf_name)
+    return tokenizer
 
-    def compute_loss(self, model, inputs, return_outputs=False):
-        """
-        Override compute_loss to apply weighted cross-entropy or focal loss.
-        """
-        labels = inputs.get("labels")
-        outputs = model(**inputs)
-        logits = outputs.logits
-        if self.use_focal:
-            alpha = None
-            if self.class_weights is not None:
-                alpha = self.class_weights.to(logits.device)
-            loss = focal_loss(logits, labels, alpha=alpha, gamma=self.gamma)
-        else:
-            if self.class_weights is not None:
-                loss_fn = nn.CrossEntropyLoss(weight=self.class_weights.to(logits.device))
-            else:
-                loss_fn = nn.CrossEntropyLoss()
-            loss = loss_fn(logits, labels)
-        return (loss, outputs) if return_outputs else loss
+def get_model(model_name: str, num_labels: int):
+    """
+    Get a HuggingFace AutoModelForSequenceClassification for the specified model.
+    Args:
+        model_name (str): Name or key of the model (as in get_tokenizer).
+        num_labels (int): Number of output labels for classification.
+    Returns:
+        PreTrainedModel: The loaded model ready for classification.
+    """
+    hf_name = _model_name_map.get(model_name.lower(), model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(hf_name, num_labels=num_labels)
+    return model
