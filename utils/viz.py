@@ -4,6 +4,7 @@ Provides plotting functions using matplotlib and seaborn.
 """
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 def plot_class_distribution(df, label_col='label', save_path=None):
     """
@@ -50,4 +51,37 @@ def plot_length_distribution(df, text_col='text', label_col='label', save_path=N
         fig.savefig(save_path)
     # Clean up the temporary column
     df.drop(columns=['__length__'], inplace=True, errors='ignore')
+    return fig
+
+
+def plot_confusion_matrix(y_true, y_pred, labels, normalize=False, save_path=None):
+    """
+    Plot a confusion matrix given true and predicted labels.
+    Args:
+        y_true (array-like): True labels.
+        y_pred (array-like): Predicted labels.
+        labels (list): List of label names (for axes).
+        normalize (bool): If True, normalize counts to percentages.
+        save_path (str): File path to save the figure (optional).
+    Returns:
+        matplotlib.figure.Figure: The confusion matrix figure.
+    """
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(y_true, y_pred, normalize='true' if normalize else None)
+    fig, ax = plt.subplots(figsize=(5,4))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt=".2f" if normalize else "d",
+        xticklabels=labels,
+        yticklabels=labels,
+        cmap="Blues",
+        ax=ax
+    )
+    ax.set_xlabel("Predicted Label")
+    ax.set_ylabel("True Label")
+    ax.set_title("Confusion Matrix" + (" (Normalized)" if normalize else ""))
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path)
     return fig
