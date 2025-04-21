@@ -5,6 +5,8 @@ Includes model loading and inference for new inputs.
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import yaml
+import numpy as np
+from lime.lime_text import LimeTextExplainer
 
 # Load config to get model path
 with open("config.yaml", "r") as f:
@@ -49,3 +51,28 @@ def predict_text(text, tokenizer, model):
     # Create a dictionary of class probabilities
     class_probs = { _label_map[i]: float(probs[i]) for i in range(len(probs)) }
     return label_name, class_probs
+
+
+def explain_prediction(text, tokenizer, model, num_features=6):
+    """
+    Generate an explanation for the model's prediction on the given text using LIME.
+    Returns:
+        list of (str, float): Top contributing words and their weights for the predicted class.
+    """
+    # Define a prediction function for LIME that returns class probabilities
+    def _predict_proba(texts):
+        results = []
+        for t in texts:
+            _, probs = predict_text(t, tokenizer, model)
+            # Return probabilities in the order of class_names
+            results.append([probs[_label_map[i]] for i in range(len(_label_map))])
+        return np.array(results)
+
+    # Use LIME to explain the prediction for this single text
+    exp = _explainer.explain_instance(text, _predict_proba, num_features=num_features, labels=[0, 1, 2])
+    # Get the predicted class index
+    pred_label, probs = predict_text(text, tokenizer, model)
+    pred_idx = int(torch.argmax(torch.tensor(list(probs.values()))))
+    # Get explanation weights for the predicted class
+    explanation = exp.as_list(label=pred_idx)
+    return explanation
