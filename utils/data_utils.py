@@ -6,7 +6,7 @@ Reads configuration to avoid hardcoded file paths.
 import pandas as pd
 import glob
 import yaml
-
+from sklearn.model_selection import train_test_split
 # Load configuration once at module import
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -60,3 +60,29 @@ def flatten_dataset(df):
     flat_df = flat_df[cols]
     print(f"[data_utils] Flattened dataset: {flat_df.shape[0]} records with columns {list(flat_df.columns)}")
     return flat_df
+
+
+def train_val_test_split(df, val_fraction=0.1, test_fraction=0.1, random_state=42):
+    """
+    Split the DataFrame into training, validation, and test sets.
+    Args:
+        df (pd.DataFrame): Cleaned dataset with 'text' and 'label'.
+        val_fraction (float): Proportion of data to use for validation.
+        test_fraction (float): Proportion of data to use for test.
+        random_state (int): Seed for reproducibility.
+    Returns:
+        (pd.DataFrame, pd.DataFrame, pd.DataFrame): train_df, val_df, test_df splits.
+    """
+    # First split off the test set from the full dataset
+    train_val_df, test_df = train_test_split(
+        df, test_size=test_fraction, stratify=df['label'], random_state=random_state)
+    # Now split the remaining into train and val
+    val_size = val_fraction / (1 - test_fraction)
+    train_df, val_df = train_test_split(
+        train_val_df, test_size=val_size, stratify=train_val_df['label'], random_state=random_state)
+    # Reset indices for cleanliness
+    train_df.reset_index(drop=True, inplace=True)
+    val_df.reset_index(drop=True, inplace=True)
+    test_df.reset_index(drop=True, inplace=True)
+    print(f"[data_utils] Split data: {len(train_df)} train, {len(val_df)} val, {len(test_df)} test.")
+    return train_df, val_df, test_df
