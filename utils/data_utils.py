@@ -86,3 +86,34 @@ def train_val_test_split(df, val_fraction=0.1, test_fraction=0.1, random_state=4
     test_df.reset_index(drop=True, inplace=True)
     print(f"[data_utils] Split data: {len(train_df)} train, {len(val_df)} val, {len(test_df)} test.")
     return train_df, val_df, test_df
+
+
+def load_modern_articles():
+    """
+    Load any new "modern articles" from the specified directory.
+    This function looks for CSV files in the modern_data_dir and concatenates them.
+    Returns:
+        pd.DataFrame: DataFrame of modern articles with a 'text' column (and no labels).
+    """
+    modern_dir = config['paths']['modern_data_dir']
+    files = glob.glob(f"{modern_dir}/*.csv")
+    articles = []
+    for file in files:
+        try:
+            df = pd.read_csv(file)
+            # Assume each modern article file has at least a 'text' column
+            if 'text' not in df.columns:
+                # Flatten if needed (similar approach as flatten_dataset)
+                text_cols = [c for c in df.columns if c.lower() in ('title', 'content', 'body')]
+                if text_cols:
+                    df['text'] = df[text_cols].apply(lambda row: ' '.join(str(val) for val in row if not pd.isna(val)), axis=1)
+            articles.append(df[['text']].copy())
+        except Exception as e:
+            print(f"[data_utils] Warning: Skipping file {file} due to read error: {e}")
+    if articles:
+        modern_df = pd.concat(articles, ignore_index=True)
+        print(f"[data_utils] Loaded {modern_df.shape[0]} modern articles from {len(files)} file(s).")
+        return modern_df
+    else:
+        print("[data_utils] No modern article files found.")
+        return pd.DataFrame(columns=['text'])
