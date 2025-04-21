@@ -4,6 +4,7 @@ These can help in exploratory analysis or alternative modeling approaches.
 """
 from textstat import textstat
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import re
 
 # Initialize VADER sentiment analyzer once
 _analyzer = SentimentIntensityAnalyzer()
@@ -34,3 +35,18 @@ def compute_sentiment(text):
         return 0.0
     scores = _analyzer.polarity_scores(text)
     return scores.get('compound', 0.0)
+
+def compute_lexical_diversity(text):
+    """
+    Compute lexical diversity of the text as the ratio of unique words to total words.
+    Returns:
+        float: Lexical diversity ratio (0 to 1).
+    """
+    if not text or not isinstance(text, str):
+        return 0.0
+    # Tokenize by word using a simple regex (alphanumeric words)
+    tokens = re.findall(r"\b\w+\b", text.lower())
+    if len(tokens) == 0:
+        return 0.0
+    unique_tokens = set(tokens)
+    return len(unique_tokens) / len(tokens)
