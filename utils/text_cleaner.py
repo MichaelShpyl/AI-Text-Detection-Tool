@@ -5,6 +5,13 @@ Lemmatization can be optionally applied in a later step.
 """
 import re
 
+try:
+    import spacy
+    # Load spaCy English model if available (to be done once)
+    _nlp = spacy.load("en_core_web_sm")
+except ImportError:
+    _nlp = None
+
 def clean_text(text, lemmatize=False):
     """
     Clean a text string by removing or normalizing unwanted characters.
@@ -26,4 +33,9 @@ def clean_text(text, lemmatize=False):
     # Basic normalization: lowercase
     text = text.lower()
     # (Lemmatization step will be added in a later commit if needed)
+    if lemmatize and _nlp:
+    # Use spaCy to lemmatize if model is loaded
+    doc = _nlp(text)
+    # Join lemmas of tokens that are alphabetic
+    text = " ".join(token.lemma_ for token in doc)
     return text
