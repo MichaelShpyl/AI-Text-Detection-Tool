@@ -1,62 +1,51 @@
-# Configuration file for the AI Text Detector project
-project: "AI Text Detector"
-
-data:
-  input_csv: "data/final_dataset.csv"         # Path to the main dataset CSV file
-  modern_articles_dir: "data/modern_articles/" # Directory for future/additional datasets
-  output_dir: "diagrams/final_model/"         # Directory to save final model artifacts
-
+# File: ai-text-detector/config.yaml
+# Global configuration for paths, hyperparameters, and settings (no hard-coded values in code).
+# The project code will read this file to get paths and parameters.
 paths:
-  logs_dir: "logs/"              # Directory for training logs
-  figs_dir: "diagrams/"          # Directory for generated figures (plots, etc.)
-  models_dir: "diagrams/final_model/"  # Directory for saved model files
+  raw_data: "data/final_dataset.csv"            # Path to original dataset CSV (must be provided)
+  modern_data_dir: "data/modern_articles/"      # Directory for future "modern articles" CSVs
+  cleaned_data: "data/cleaned_dataset.parquet"  # Path where cleaned full dataset will be saved
+  train_data: "data/train_dataset.parquet"      # Path for training split
+  val_data: "data/val_dataset.parquet"          # Path for validation split
+  test_data: "data/test_dataset.parquet"        # Path for test split
+  figures_dir: "diagrams/"                     # Directory to save figures/plots
+  model_dirs:                                   # Directories to save fine-tuned models
+    bert: "diagrams/bert/"
+    roberta: "diagrams/roberta/"
+    longformer: "diagrams/longformer/"
+    final: "diagrams/final_model/"
+  log_file: "logs/training.log"                # File for training logs
+  session_log_json: "logs/sessions.json"       # File for saved session inputs (Dash)
+  session_log_csv: "logs/sessions.csv"         # File for saved session inputs (Streamlit)
 
 training:
-  seed: 42                       # Random seed for reproducibility
-  epochs: 3
-  batch_size: 16
+  epochs:
+    bert: 3
+    roberta: 3
+    longformer: 3
+  batch_size:
+    bert: 16
+    roberta: 16
+    longformer: 4              # Longformer uses smaller batch due to memory
   learning_rate: 2e-5
-  weight_decay: 0.01
-  max_seq_length: 512            # Max token length for transformer models (512 for BERT/RoBERTa)
-  stratify_split: true           # Stratify train/val/test split by class
-  train_split: 0.8               # Fraction of data for training
-  val_split: 0.1                 # Fraction of data for validation (remaining 0.1 for test)
-  use_gpu: true                  # Whether to use GPU if available
-  use_tpu: false                 # Whether to use TPU if available (e.g., in Colab)
-  
-models:
-  base_model: "bert-base-uncased" # Base model checkpoint for initial experiments
-  use_roberta: true             # Include RoBERTa-base model in training pipeline
-  use_longformer: true          # Include Longformer model (for long input support up to 4096 tokens)
-  use_bigbird: false            # (Stub) BigBird model integration planned
-  use_deberta: false            # (Stub) DeBERTa model integration planned
+  max_length:
+    bert_roberta: 512
+    longformer: 4096
+  gradient_accumulation_steps: 2
+  use_focal_loss: false        # Whether to use focal loss (else use weighted CE)
+  early_stopping_patience: 1   # Stop training if no improvement after this many epochs
 
-loss:
-  use_class_weights: true       # Use class weights for loss to handle any imbalance
-  use_focal_loss: false         # Use focal loss instead of standard cross-entropy
-  focal_gamma: 2                # Gamma parameter for focal loss (if used)
+model:
+  label_mapping:               # Mapping of class names to numeric labels
+    human: 0
+    ai_paraphrased: 1
+    ai_generated: 2
 
-tuning:
-  use_optuna: true              # Enable hyperparameter tuning with Optuna
-  n_trials: 20                  # Number of Optuna trials for hyperparameter optimization
-  optimize_metric: "macro_f1"   # Metric to optimize during tuning (macro F1 on validation set)
+dashboard:
+  enable_dash: true            # Flag to enable/disable running Dash app
+  enable_streamlit: true       # Flag to enable/disable running Streamlit app
+  theme: "light"               # UI theme preference (for future use)
 
 logging:
-  use_wandb: true               # Enable Weights & Biases logging if API key is set
-  wandb_project: "ai_text_detection"
-  log_interval: 100             # Logging interval (in steps) during training
-
-preprocessing:
-  do_lowercase: true
-  remove_html: true
-  remove_non_ascii: true
-  do_lemmatize: false
-  detect_language: false        # If true, filter out or translate non-English texts
-  augment_backtranslation: false # (Stub) Back-translation augmentation for training
-
-features:
-  compute_readability: true     # Compute readability metrics (e.g., Flesch-Kincaid score)
-  compute_sentiment: true       # Compute sentiment polarity scores
-  compute_lexical_diversity: true  # Compute lexical diversity (e.g., type-token ratio)
-  compute_ner_counts: false     # (Stub) Count named entities in text
-  compute_topic_model: false    # (Stub) Topic modeling features for texts
+  use_wandb: false             # Set true to enable Weights & Biases logging
+  wandb_project: "ai_text_detector"

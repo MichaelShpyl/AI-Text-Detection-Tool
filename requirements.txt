@@ -19,6 +19,5 @@ optuna==3.2.0         # Hyperparameter optimization framework
 wandb==0.16.2         # Weights & Biases for experiment tracking and logging
 shap==0.41.0          # SHAP (SHapley Additive exPlanations) for model interpretability
 lime==0.2.0.1         # LIME (Local Interpretable Model-Agnostic Explanations)
-# Optional (for future feature stubs):
-# spacy==3.5.3        # (Optional) spaCy for advanced NLP (e.g., NER)
-# en-core-web-sm==3.5.0  # (Optional) spaCy English model for NER
+spacy==3.5.3        # (Optional) spaCy for advanced NLP (e.g., NER)
+en-core-web-sm==3.5.0  # (Optional) spaCy English model for NER
