@@ -6,7 +6,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import Trainer
 import torch
 import torch.nn.functional as F
-
+from sklearn.metrics import accuracy_score, f1_score
 
 # Default model name mapping for convenience
 _model_name_map = {
@@ -86,3 +86,15 @@ class CustomTrainer(Trainer):
             # Standard weighted cross-entropy
             loss = ce_loss.mean()
         return (loss, outputs) if return_outputs else loss
+
+
+def compute_metrics(eval_pred):
+    """
+    Compute evaluation metrics given predictions.
+    Returns a dict with accuracy and macro-F1 score.
+    """
+    logits, labels = eval_pred
+    preds = logits.argmax(axis=1)
+    acc = accuracy_score(labels, preds)
+    f1 = f1_score(labels, preds, average='macro')
+    return {"accuracy": acc, "f1": f1}
