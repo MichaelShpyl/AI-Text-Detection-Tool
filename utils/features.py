@@ -5,7 +5,7 @@ These can help in exploratory analysis or alternative modeling approaches.
 from textstat import textstat
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import re
-
+import pandas as pd
 # Initialize VADER sentiment analyzer once
 _analyzer = SentimentIntensityAnalyzer()
 
@@ -50,3 +50,20 @@ def compute_lexical_diversity(text):
         return 0.0
     unique_tokens = set(tokens)
     return len(unique_tokens) / len(tokens)
+
+def compute_all_features(df):
+    """
+    Compute all supported features for each text in the DataFrame.
+    Adds columns 'readability', 'sentiment', and 'lexical_diversity' to the DataFrame.
+    Args:
+        df (pd.DataFrame): DataFrame with a 'text' column (and optionally 'label').
+    Returns:
+        pd.DataFrame: DataFrame with new feature columns added.
+    """
+    if 'text' not in df.columns:
+        raise KeyError("DataFrame must contain a 'text' column.")
+    # Compute each feature and add as new column
+    df['readability'] = df['text'].apply(compute_readability)
+    df['sentiment'] = df['text'].apply(compute_sentiment)
+    df['lexical_diversity'] = df['text'].apply(compute_lexical_diversity)
+    return df

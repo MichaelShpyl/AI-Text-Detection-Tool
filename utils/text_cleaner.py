@@ -34,8 +34,8 @@ def clean_text(text, lemmatize=False):
     text = text.lower()
     # (Lemmatization step will be added in a later commit if needed)
     if lemmatize and _nlp:
-    # Use spaCy to lemmatize if model is loaded
-    doc = _nlp(text)
-    # Join lemmas of tokens that are alphabetic
-    text = " ".join(token.lemma_ for token in doc)
+        # Use spaCy to lemmatize if model is loaded
+        doc = _nlp(text)
+        # Join lemmas of tokens that are alphabetic
+        text = " ".join(token.lemma_ for token in doc)
     return text
