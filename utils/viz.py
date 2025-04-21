@@ -5,6 +5,7 @@ Provides plotting functions using matplotlib and seaborn.
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from sklearn.metrics import roc_curve, precision_recall_curve, auc
 
 def plot_class_distribution(df, label_col='label', save_path=None):
     """
@@ -85,3 +86,55 @@ def plot_confusion_matrix(y_true, y_pred, labels, normalize=False, save_path=Non
     if save_path:
         fig.savefig(save_path)
     return fig
+
+
+def plot_roc_curves(y_true, y_prob, class_names, save_path=None):
+    """
+    Plot ROC curves for each class (one vs rest).
+    Args:
+        y_true (array-like): True labels (integers).
+        y_prob (ndarray): Predicted probabilities (shape: n_samples x n_classes).
+        class_names (list): Names of classes for labeling.
+        save_path (str): File path to save the figure (optional).
+    Returns:
+        matplotlib.figure.Figure: The ROC curves figure.
+    """
+    fig, ax = plt.subplots(figsize=(6,5))
+    n_classes = len(class_names)
+    for i in range(n_classes):
+        # Binarize labels for class i vs rest
+        true_binary = (y_true == i).astype(int)
+        fpr, tpr, _ = roc_curve(true_binary, y_prob[:, i])
+        roc_auc = auc(fpr, tpr)
+        ax.plot(fpr, tpr, label=f"{class_names[i]} (AUC = {roc_auc:.2f})")
+    ax.plot([0,1], [0,1], 'k--')
+    ax.set_title("ROC Curves")
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.legend(loc="lower right")
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path)
+    return fig
+
+def plot_pr_curves(y_true, y_prob, class_names, save_path=None):
+    """
+    Plot Precision-Recall curves for each class (one vs rest).
+    """
+    fig, ax = plt.subplots(figsize=(6,5))
+    n_classes = len(class_names)
+    for i in range(n_classes):
+        true_binary = (y_true == i).astype(int)
+        precision, recall, _ = precision_recall_curve(true_binary, y_prob[:, i])
+        pr_auc = auc(recall, precision)
+        ax.plot(recall, precision, label=f"{class_names[i]} (AUC = {pr_auc:.2f})")
+    ax.set_title("Precision-Recall Curves")
+    ax.set_xlabel("Recall")
+    ax.set_ylabel("Precision")
+    ax.legend(loc="upper right")
+    fig.tight_layout()
+    if save_path:
+        fig.savefig(save_path)
+    return fig
+
+
