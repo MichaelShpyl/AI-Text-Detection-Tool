@@ -21,3 +21,4 @@ shap==0.41.0          # SHAP (SHapley Additive exPlanations) for model interpret
 lime==0.2.0.1         # LIME (Local Interpretable Model-Agnostic Explanations)
 spacy==3.5.3        # (Optional) spaCy for advanced NLP (e.g., NER)
 en-core-web-sm==3.5.0  # (Optional) spaCy English model for NER
+vaderSentiment>=3.3.2
