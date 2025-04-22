@@ -1,0 +1,4 @@
+"notebooks/.ipynb_checkpoints/"    
+"utils/__pycache__/"                
+"ai_text_detection_tool.egg-info/"  
+"data/*.parquet"                    
