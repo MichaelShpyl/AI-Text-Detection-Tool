@@ -1,9 +1,14 @@
-"notebooks/.ipynb_checkpoints/"    
-"utils/__pycache__/"                
-"ai_text_detection_tool.egg-info/"  
-"data/*.parquet"                    
-"/notebooks/.ipynb_checkpoints/"   
-"/utils/__pycache__/"               
-"/ai_text_detection_tool.egg-info/" 
-"/diagrams/"                        
-"data/*.parquet"                    
+# ignore Jupyter checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Python caches
+utils/__pycache__/
+
+# Package metadata
+ai_text_detection_tool.egg-info/
+
+# Diagrams folder
+diagrams/
+
+# All Parquet splits
+data/*.parquet
