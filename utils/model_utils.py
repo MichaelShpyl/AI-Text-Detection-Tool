@@ -62,29 +62,44 @@ class CustomTrainer(Trainer):
             self.class_weights = None
         self.gamma = gamma
 
-    def compute_loss(self, model, inputs, return_outputs=False):
+    def compute_loss(
+        self,
+        model,
+        inputs,
+        return_outputs: bool = False,
+        num_items_in_batch: int = None,  # <— accept & ignore this extra arg
+    ):
         """
-        Override compute_loss to apply weighted cross-entropy or focal loss.
+        Override compute_loss to apply weighted cross‑entropy or focal loss,
+        while staying compatible with HF Trainer’s evolving signature.
         """
-        labels = inputs.get("labels")
-        # Forward pass (do not pass labels to model to compute raw logits)
-        outputs = model(**{k: v for k, v in inputs.items() if k != "labels"})
-        logits = outputs.get("logits") if isinstance(outputs, dict) else outputs[0]
-        # Compute standard cross-entropy loss (with optional class weights)
+        labels = inputs.pop("labels")
+
+        # Forward pass → raw logits
+        outputs = model(**inputs)
+        logits  = outputs.logits if hasattr(outputs, "logits") else outputs[0]
+
+        # move class weights to same device
         if self.class_weights is not None:
             self.class_weights = self.class_weights.to(logits.device)
-        ce_loss = F.cross_entropy(logits, labels, weight=self.class_weights, reduction='none')
+
+        # per‐sample cross‐entropy (with optional weighting)
+        ce_loss = F.cross_entropy(
+            logits,
+            labels,
+            weight=self.class_weights,
+            reduction="none"
+        )
+
         if self.use_focal:
-            # Compute softmax probabilities for focal loss
-            probs = F.softmax(logits, dim=1)
-            # Get the probabilities of the true class for each sample
-            pt = probs[range(len(labels)), labels]
-            # Focal loss scaling factor ( (1 - p_t)^gamma )
+            # focal loss: scale by (1−p_t)^γ
+            probs        = F.softmax(logits, dim=1)
+            pt           = probs[range(len(labels)), labels]
             focal_factor = (1 - pt) ** self.gamma
-            loss = (focal_factor * ce_loss).mean()
+            loss         = (focal_factor * ce_loss).mean()
         else:
-            # Standard weighted cross-entropy
             loss = ce_loss.mean()
+
         return (loss, outputs) if return_outputs else loss
 
 
