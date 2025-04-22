@@ -7,30 +7,45 @@ import seaborn as sns
 import numpy as np
 from sklearn.metrics import roc_curve, precision_recall_curve, auc
 
-def plot_class_distribution(df, label_col='label', save_path=None):
+def plot_class_distribution(df, label_col='label', colors=None, save_path=None):
     """
-    Plot a bar chart of class distribution.
-    Optionally save the figure to a file.
+    Plot a bar chart of class distribution with distinct colors and percentage annotations.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing the label column.
+        label_col (str): Name of the column containing class labels.
+        colors (list): Optional list of colors (one per class).
+        save_path (str): Optional path to save the figure.
+    
     Returns:
         matplotlib.figure.Figure: The figure object for further manipulation if needed.
     """
     counts = df[label_col].value_counts()
     classes = counts.index.tolist()
-    values  = counts.values
+    values = counts.values
 
-    fig, ax = plt.subplots(figsize=(6,4))
-    ax.bar(classes, values)            # <-- changed here
+    # If no custom colors provided, grab distinct colors from the 'tab10' colormap
+    if colors is None:
+        cmap = plt.get_cmap('tab10')
+        colors = [cmap(i) for i in range(len(classes))]
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(classes, values, color=colors)
 
     ax.set_title("Class Distribution")
     ax.set_xlabel("Class")
     ax.set_ylabel("Number of samples")
+
+    total = values.sum()
     for i, v in enumerate(values):
-        ax.text(i, v + 0.5, str(v), ha='center')
+        pct = v / total * 100
+        ax.text(i, v + 0.5, f"{v}\n({pct:.1f}%)", ha='center')
 
     fig.tight_layout()
     if save_path:
         fig.savefig(save_path)
     return fig
+
 
 def plot_length_distribution(df, text_col='text', label_col='label', save_path=None):
     """
