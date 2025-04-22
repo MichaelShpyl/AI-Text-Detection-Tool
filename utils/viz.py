@@ -47,31 +47,83 @@ def plot_class_distribution(df, label_col='label', colors=None, save_path=None):
     return fig
 
 
-def plot_length_distribution(df, text_col='text', label_col='label', save_path=None):
+def plot_length_distribution(
+    df,
+    text_col='text',
+    label_col='label',
+    save_path=None
+):
     """
     Plot the distribution of text lengths for each class.
-    Creates overlapping histograms colored by class.
-    Optionally save the figure to a file.
+    Uses density histograms + KDE, marks medians, adds rug plots,
+    and limits x-axis to the 99th percentile to handle outliers.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing at least the text and label columns.
+        text_col (str): Column name for the text.
+        label_col (str): Column name for the class labels.
+        save_path (str): If provided, saves the figure to this path.
+
     Returns:
         matplotlib.figure.Figure: The figure object.
     """
     # Compute text lengths
     df['__length__'] = df[text_col].apply(lambda x: len(str(x).split()))
-    fig, ax = plt.subplots(figsize=(6,4))
+
+    # Set x-axis limit at the 99th percentile
+    max_len = int(df['__length__'].quantile(0.99))
+    bins = np.linspace(0, max_len, 40)
+
     classes = df[label_col].unique()
-    for cls in classes:
+    cmap = plt.get_cmap('tab10')
+    colors = [cmap(i) for i in range(len(classes))]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for cls, color in zip(classes, colors):
         lengths = df[df[label_col] == cls]['__length__']
-        sns.histplot(lengths, ax=ax, bins=30, label=str(cls), element="step", fill=False)
+
+        # Plot density histogram + KDE
+        sns.histplot(
+            lengths,
+            bins=bins,
+            stat="density",
+            kde=True,
+            color=color,
+            alpha=0.3,
+            label=str(cls),
+            ax=ax
+        )
+
+        # Mark the median length
+        med = lengths.median()
+        ax.axvline(med, color=color, linestyle="--", linewidth=1)
+        ax.text(
+            med,
+            ax.get_ylim()[1] * 0.8,
+            f"{med:.0f}",
+            color=color,
+            rotation=90,
+            ha="right",
+            va="center"
+        )
+
+        # Add a rug plot to show individual samples
+        sns.rugplot(lengths, ax=ax, color=color, height=0.02, alpha=0.5)
+
+    ax.set_xlim(0, max_len)
     ax.set_title("Article Length Distribution by Class")
     ax.set_xlabel("Length (words)")
-    ax.set_ylabel("Count")
+    ax.set_ylabel("Density")
     ax.legend(title="Class")
+
     fig.tight_layout()
     if save_path:
         fig.savefig(save_path)
-    # Clean up the temporary column
+
+    # Cleanup temporary column
     df.drop(columns=['__length__'], inplace=True, errors='ignore')
     return fig
+
 
 
 def plot_confusion_matrix(y_true, y_pred, labels, normalize=False, save_path=None):
