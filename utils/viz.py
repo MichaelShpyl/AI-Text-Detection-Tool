@@ -16,13 +16,17 @@ def plot_class_distribution(df, label_col='label', save_path=None):
     """
     counts = df[label_col].value_counts()
     classes = counts.index.tolist()
+    values  = counts.values
+
     fig, ax = plt.subplots(figsize=(6,4))
-    sns.barplot(x=classes, y=counts.values, ax=ax, palette='pastel')
+    ax.bar(classes, values)            # <-- changed here
+
     ax.set_title("Class Distribution")
     ax.set_xlabel("Class")
     ax.set_ylabel("Number of samples")
-    for i, v in enumerate(counts.values):
+    for i, v in enumerate(values):
         ax.text(i, v + 0.5, str(v), ha='center')
+
     fig.tight_layout()
     if save_path:
         fig.savefig(save_path)
