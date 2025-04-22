@@ -37,7 +37,7 @@ training:
 
 model:
   label_mapping:               # Mapping of class names to numeric labels
-    human: 0
+    human_written: 0
     ai_paraphrased: 1
     ai_generated: 2
 
