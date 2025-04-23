@@ -67,6 +67,8 @@ function BatchUpload() {
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
+        onDragEnter={e => e.currentTarget.classList.add('border-blue-500')}
+        onDragLeave={e => e.currentTarget.classList.remove('border-blue-500')}
         className="flex items-center justify-center p-6 mb-4 border-2 border-dashed border-gray-400 rounded cursor-pointer hover:border-gray-600 dark:border-gray-500 dark:hover:border-gray-300"
       >
         <div className="text-center">
@@ -96,7 +98,7 @@ function BatchUpload() {
           </thead>
           <tbody>
             {files.map((fs, idx) => (
-              <tr key={idx} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800">
+              <tr key={idx} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                 <td className="py-2 px-2">{fs.file.name}</td>
                 <td className="py-2 px-2">
                   {fs.status === 'pending'

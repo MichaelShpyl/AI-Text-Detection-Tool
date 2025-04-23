@@ -4,3 +4,7 @@
 2025-04-22 18:05:25,742 INFO: Started training pipeline (BERT → RoBERTa)
 2025-04-22 18:13:11,121 INFO: Started training pipeline (BERT → RoBERTa)
 2025-04-22 18:16:54,185 INFO: Started training pipeline (BERT → RoBERTa)
+2025-04-22 18:21:26,641 INFO: Started training pipeline (BERT → RoBERTa)
+2025-04-22 19:10:22,470 INFO: Started training pipeline (BERT → RoBERTa)
+2025-04-23 03:22:28,798 INFO: BERT validation metrics → {'eval_loss': 0.22874490916728973, 'eval_accuracy': 0.9154820367019901, 'eval_f1': 0.9150964052591188, 'eval_runtime': 515.2243, 'eval_samples_per_second': 75.094, 'eval_steps_per_second': 4.695, 'epoch': 2.0}
+2025-04-23 03:22:41,521 WARNING: Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`

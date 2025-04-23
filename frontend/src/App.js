@@ -46,9 +46,9 @@ function App() {
 
       {/* Mobile top bar */}
       <header className="flex md:hidden items-center justify-between p-4 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-        <button onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button>
+      <button onClick={() => setMenuOpen(true)} className="focus:outline-none" aria-label="Open menu"> ☰ </button>
         <h2 className="text-lg font-semibold">AI Text Detector</h2>
-        <button onClick={toggleDark} aria-label="Toggle dark mode">
+        <button onClick={toggleDarkMode} className="focus:outline-none" aria-label="Toggle dark mode">
           {darkMode ? '🌙' : '🌞'}
         </button>
       </header>
