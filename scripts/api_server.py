@@ -12,6 +12,8 @@ from docx import Document
 from pdf2image import convert_from_bytes
 import pytesseract
 from io import BytesIO
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # ─── Initialize FastAPI app ───────────────────────────────────────────────
 app = FastAPI(title="AI Text Detector API")
@@ -49,6 +51,7 @@ class TextRequest(BaseModel):
 # ─── Single-text prediction endpoint ──────────────────────────────────────
 @app.post("/predict")
 async def predict_text(req: TextRequest):
+    logging.info("🛈 /predict called")
     text = req.text
     # Tokenize and run the model
     inputs = tokenizer(
@@ -94,6 +97,7 @@ async def predict_text(req: TextRequest):
 
 @app.post("/analyze-file")
 async def analyze_file(file: UploadFile = File(...)):
+    logging.info(f"🛈 /analyze-file called for {file.filename}")
     """
     Analyze an uploaded file (txt, html, docx, or pdf). Extracts text and returns prediction results.
     """
