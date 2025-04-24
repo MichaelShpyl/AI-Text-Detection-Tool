@@ -79,15 +79,15 @@ function SingleAnalysis() {
               {/* Probability bars for each class */}
               {Object.entries(result.probabilities).map(([label, prob]) => (
                 <div key={label} className="flex items-center mb-1">
-                  <div className="h-2 rounded bg-green-500" style={{ width: `${p*100}%` }} />
+                  <div className="h-2 rounded bg-green-500" style={{ width: `${prob*100}%` }} />
                   <span className="ml-2 text-xs">{label}: {(prob * 100).toFixed(1)}%</span>
                 </div>
               ))}
             </div>
           )}
-          {result.explanation && (
+           {result.explanation && (
             <p className="text-sm leading-relaxed">
-              {renderHighlightedText()}
+            {renderHighlightedText()}
             </p>
           )}
         </div>
