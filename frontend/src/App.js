@@ -25,14 +25,15 @@ function App() {
             className={`w-full text-left px-3 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-700 ${
               page==='single' ? 'bg-gray-300 dark:bg-gray-700' : ''
             }`}
-          >🔎 Single Text</button>
+          ><span role="img" aria-label="single text">🔎</span> Single Text
+</button>
 
           <button
             onClick={() => setPage('batch')}
             className={`w-full text-left px-3 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-700 ${
               page==='batch' ? 'bg-gray-300 dark:bg-gray-700' : ''
             }`}
-          >📂 Batch Upload</button>
+          ><span role="img" aria-label="batch upload">📂</span> Batch Upload</button>
         </nav>
         <div className="p-4 border-t border-gray-300 dark:border-gray-700">
           <button
@@ -48,8 +49,11 @@ function App() {
       <header className="flex md:hidden items-center justify-between p-4 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <button onClick={() => setMenuOpen(true)} className="focus:outline-none" aria-label="Open menu"> ☰ </button>
         <h2 className="text-lg font-semibold">AI Text Detector</h2>
-        <button onClick={toggleDarkMode} className="focus:outline-none" aria-label="Toggle dark mode">
-          {darkMode ? '🌙' : '🌞'}
+        <button onClick={toggleDark}     className="focus:outline-none" aria-label="Toggle dark mode">
+        {darkMode
+        ? <span role="img" aria-label="dark mode on">🌙</span>
+        : <span role="img" aria-label="dark mode off">🌞</span>
+        } 
         </button>
       </header>
 
@@ -68,11 +72,12 @@ function App() {
           <button
             onClick={() => { setPage('single'); setMenuOpen(false); }}
             className="block w-full text-left px-3 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-700"
-          >🔎 Single Text</button>
+          ><span role="img" aria-label="single text">🔎</span> Single Text
+</button>
           <button
             onClick={() => { setPage('batch'); setMenuOpen(false); }}
             className="block w-full text-left px-3 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-700"
-          >📂 Batch Upload</button>
+          ><span role="img" aria-label="batch upload">📂</span> Batch Upload</button>
         </nav>
         <div className="mt-4 pt-4 border-t border-gray-400">
           <button
