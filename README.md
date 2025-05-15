@@ -13,7 +13,7 @@ This repository hosts a proof-of-concept pipeline for detecting AI-generated tex
 
 Key contributions:
 - Comprehensive preprocessing and feature engineering (tokenization, normalization, stopword removal, TF-IDF)  
-- Custom dataset sampling from “All the News 2.0” with multi-stage AI paraphrasing via GPT-4  
+- Custom dataset sampling from “All the News 2.0” with multi-stage AI paraphrasing via DeepSeek  
 - Detection models: Random Forest, XGBoost, hybrid classifiers, and transformer-based detectors  
 - Explainability module using LIME and contrastive semantic techniques  
 
