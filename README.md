@@ -1,113 +1,214 @@
-# AI-Text-Detection-Tool
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/) [![Node.js 14+](https://img.shields.io/badge/Node.js-14%2B-green.svg)](https://nodejs.org/)
 
-**Detecting AI-Generated Text in Long-Form Content Using NLP Techniques**  
-*A Study on Enhancing Academic Integrity and Improving AI Training*  
+# AI Text Detection Tool
 
-**Author:** Michael Shpyl  
-**Supervisors:** Kevin Meehan, Mandy Douglas, Martin Robinson,  
-
----
-
-## 🚀 Project Overview
-This repository hosts a proof-of-concept pipeline for detecting AI-generated text in long-form content (news articles and academic essays). By combining advanced NLP preprocessing, statistical and hybrid detection methods, transformer-based architectures (BERT, RoBERTa, Longformer), and explainable AI techniques (LIME), the tool achieves high accuracy (≈97%) while providing transparent, provable evidence for its decisions.
-
-Key contributions:
-- Comprehensive preprocessing and feature engineering (tokenization, normalization, stopword removal, TF-IDF)  
-- Custom dataset sampling from “All the News 2.0” with multi-stage AI paraphrasing via DeepSeek  
-- Detection models: Random Forest, XGBoost, hybrid classifiers, and transformer-based detectors  
-- Explainability module using LIME and contrastive semantic techniques  
+A modular, full-stack system for detecting AI-generated text in news and academic essays.  
+Supports API, dashboards, web apps, and a Chrome extension for real-time scanning and explainability.
 
 ---
 
-## 📂 Repository Structure
-
-```
-AI-Text-Detection-Tool/
-├── data/             # Raw and processed datasets (subset of All the News 2.0)
-├── notebooks/        # Jupyter notebooks for preprocessing, model training, and analysis
-├── scripts/          # ETL, data cleaning, training, evaluation scripts
-├── extension/        # Browser extension for batch text classification
-├── frontend/         # React dashboard for visualizing detection results
-├── utils/            # Helper functions and modules
-├── logs/             # Model checkpoints and training logs
-├── EXAMINER_GUIDE.md # Instructions for examiners and deployment details
-├── config.yaml       # Configuration for model parameters and training
-├── requirements.txt  # Python dependencies
-├── setup.py          # Package setup (editable install)
-└── README.md         # This file
-```
+## Table of Contents
+- [AI Text Detection Tool](#ai-text-detection-tool)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Running the Project](#running-the-project)
+    - [Backend API](#backend-api)
+    - [Dashboard (Plotly Dash)](#dashboard-plotly-dash)
+    - [React Frontend](#react-frontend)
+    - [Chrome Extension](#chrome-extension)
+  - [API Usage](#api-usage)
+  - [Project Structure](#project-structure)
+  - [Contributing](#contributing)
+  - [Roadmap](#roadmap)
+  - [Troubleshooting](#troubleshooting)
+  - [License](#license)
+  - [Contact](#contact)
+  - [Acknowledgments](#acknowledgments)
 
 ---
 
-## 🛠️ Installation & Setup
+## Features
+- **FastAPI Backend** with a fine-tuned RoBERTa model for high-accuracy inference.
+- **LIME Explainability** highlights which words influenced each prediction.
+- **Plotly Dash Dashboard** for interactive EDA, model evaluation, and inference.
+- **React Web App** for single-text and batch-file analysis with a responsive UI.
+- **Chrome Extension** enabling on-page scanning of any web content.
 
-1. **Clone the repository**  
+---
+
+## Prerequisites
+- **Python** 3.10 or higher  
+- **Node.js** 14.x or higher + npm  
+- Optional: **Docker** & **Docker Compose** (for containerized setup)
+
+---
+
+## Installation
+
+1. **Clone the repo**  
    ```bash
    git clone https://github.com/MichaelShpyl/AI-Text-Detection-Tool.git
    cd AI-Text-Detection-Tool
    ```
 
-2. **Install Python dependencies**  
+2. **Create & activate a Python virtual environment**  
    ```bash
+   python -m venv venv
+   source venv/bin/activate      # Linux/macOS
+   venv\Scripts\activate.bat   # Windows
+   ```
+
+3. **Install Python dependencies**  
+   ```bash
+   pip install --upgrade pip
    pip install -r requirements.txt
    ```
 
-3. **Install frontend dependencies**  
+4. **Install frontend dependencies**  
    ```bash
    cd frontend
    npm install
+   cd ..
    ```
 
 ---
 
-## 💡 Usage
+## Configuration
 
-### 1. Data Preparation
+- **`.env` file** (optional): You can create a `.env` in the project root with:
+  ```ini
+  BACKEND_HOST=127.0.0.1
+  BACKEND_PORT=8000
+  MODEL_PATH=./models/roberta_ai_detector.pt
+  ```
+
+- **Dash settings**: By default, the Dash app will connect to `http://127.0.0.1:8000`. Adjust in `scripts/dashboard_app.py` if needed.
+
+---
+
+## Running the Project
+
+### Backend API
 ```bash
-python scripts/load_data.py \
-  --input data/raw_dataset.csv \
-  --output data/processed_dataset.csv
+cd scripts
+python api_server.py
 ```
+- Starts FastAPI at `http://127.0.0.1:8000`
+- Loads the trained model into memory
 
-### 2. Model Training
-```bash
-python scripts/train.py --config config.yaml
-```
+---
 
-### 3. API Server
-```bash
-uvicorn api.main:app --reload
-```
+### Dashboard (Plotly Dash)
+- **Option A – Notebook**  
+  Open `notebooks/06_dashboard_dash.ipynb` in Jupyter and **Run All**.
+- **Option B – Script**  
+  ```bash
+  python scripts/dashboard_app.py
+  ```
+  - Dashboard runs at `http://localhost:8050`  
+  - Tabs: EDA, Evaluation, Inference (API-backed)
 
-### 4. Visualization Frontend
+---
+
+### React Frontend
 ```bash
 cd frontend
 npm start
 ```
-
-### 5. Browser Extension
-- Load the `extension/` directory in Chrome/Edge developer mode to classify texts directly from any webpage.
-
----
-
-## 🧪 Evaluation & Results
-- Model accuracy: ~97% on held-out test set  
-- Metrics: Precision, Recall, F1, ROC and PR curves (notebooks/analysis)  
-- Explainability: LIME-based local and global explanations for classification decisions
+- Opens at `http://localhost:3000`  
+- Sidebar: **Single Text Analysis** | **Batch Upload**
 
 ---
 
-## 🤝 Contributing
-Contributions are welcome! To contribute:
+### Chrome Extension
+1. Go to `chrome://extensions/`, enable **Developer mode**  
+2. Click **Load unpacked**, select the `extension/` folder  
+3. Visit any webpage, click **Scan this article**  
+4. View predictions & highlights (ensure API is running)
+
+---
+
+## API Usage
+
+```bash
+# Single-text inference
+curl -X POST http://127.0.0.1:8000/predict   -H "Content-Type: application/json"   -d '{"text": "Sample input text to analyze."}'
+```
+```json
+{
+  "prediction": "AI-generated",
+  "confidence": 0.97
+}
+```
+
+---
+
+## Project Structure
+
+```
+AI-Text-Detection-Tool/
+├── scripts/                 # Backend API & Dash launcher
+│   ├── api_server.py
+│   └── dashboard_app.py
+├── notebooks/               # Jupyter analysis & Dash notebook
+├── frontend/                # React single/batch analysis app
+├── extension/               # Chrome extension source code
+├── data/                    # Sample datasets for batch testing
+├── models/                  # Trained model weights
+├── requirements.txt         # Python dependencies
+├── package.json             # Frontend dependencies
+├── README.md                # This file
+└── LICENSE                  # MIT license
+```
+
+---
+
+## Contributing
+
 1. Fork the repo  
-2. Create a feature branch (`git checkout -b feature/YourFeature`)  
-3. Commit your changes (`git commit -m 'feat: add new feature'`)  
-4. Push to the branch (`git push origin feature/YourFeature`)  
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/awesome-new`
+3. Commit your changes: `git commit -m "feat: add awesome feature"`
+4. Push to your branch: `git push origin feature/awesome-new`
+5. Open a Pull Request  
 
-Please follow the existing code style and include tests where applicable.
+Please follow the [Contributing Guidelines](CONTRIBUTING.md) if available.
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Roadmap
+
+- [ ] Add automated unit tests & CI via GitHub Actions  
+- [ ] Containerize with Docker & Docker Compose  
+- [ ] Publish Python package to PyPI  
+- [ ] Enhance Chrome extension UI with dark mode toggle  
+
+---
+
+## Troubleshooting
+
+- **API errors**? Check `scripts/api_server.py` logs for stack traces.  
+- **Model loading issues**? Verify `MODEL_PATH` points to the correct `.pt` file.  
+- **Port conflicts**? Change ports via `.env` or command-line flags.
+
+---
+
+## License
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Contact
+
+Michael Shpyl – [michael.shpyl@gmail.com](mailto:michael.shpyl@gmail.com)  
+Project repo: https://github.com/MichaelShpyl/AI-Text-Detection-Tool
+
+---
+
+## Acknowledgments
+
+- Built with ❤ using FastAPI, Plotly Dash, React, and LIME  
+- Thanks to [DSP Sligo Business Improvement Team](https://www.gov.ie/dsp) for guidance  
